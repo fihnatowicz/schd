@@ -1,2 +1,16 @@
+# исходник расписания (расписание живёт в schedule.json)
 *.xlsx
+# временные файлы Excel/Office
+~$*
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+# редакторы и ОС
 .claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

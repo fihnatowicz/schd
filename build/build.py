@@ -1,8 +1,13 @@
 """
-Собирает ../index.html из xlsx-расписания.
+Обновляет расписание сайта.
 
-    python build/build.py                       # берёт первый *.xlsx в папке проекта, лист "1  акт"
+    python build/build.py                       # пересобрать index.html из schedule.json
+    python build/build.py file.xlsx             # разобрать xlsx (лист "1  акт") -> schedule.json -> index.html
     python build/build.py file.xlsx "1  акт"    # явно указать файл и лист
+
+Разметка живёт в index.html, стили в app.css, логика в app.js — их можно править
+руками, пересборка для этого не нужна. Скрипт трогает только блок
+<script id="schedule"> внутри index.html.
 
 Соседние одинаковые 45-минутные слоты склеиваются в один блок (границы слотов
 сохраняются — по ним страница определяет «перерыв» внутри блока).
@@ -12,8 +17,6 @@ import json
 import os
 import re
 import sys
-
-import openpyxl
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -45,10 +48,6 @@ SUBJECT_FIX = {'Бел.яз.': 'Белорусский язык'}
 META = {
     'title': 'Ангелина',
     'subtitle': 'актёрское искусство · 1 курс',
-    'logo': '💅',
-    # бегущая лента в шапке
-    'ribbon': '💅 АНГЕЛИНА СУПЕР ✨ ANGELINA THE BEST 💖 АНГЕЛИНА THE BEST ⭐ ANGELINA SUPER 🎀 '
-              'АНГЕЛИНА ЛУЧШАЯ 💅 ANGELINA SLAY 🌟 АНГЕЛИНА ЗВЕЗДА ♥',
 }
 
 
@@ -127,6 +126,7 @@ def special(parts):
 
 
 def parse(xlsx, sheet):
+    import openpyxl                      # нужен только для разбора xlsx
     ws = openpyxl.load_workbook(xlsx, data_only=True)[sheet]
     days, current = [], None
     for r in range(12, ws.max_row + 1):
@@ -161,18 +161,46 @@ def parse(xlsx, sheet):
     return {'meta': META, 'days': days}
 
 
-def main():
-    xlsx = sys.argv[1] if len(sys.argv) > 1 else sorted(glob.glob(os.path.join(ROOT, '*.xlsx')))[0]
-    sheet = sys.argv[2] if len(sys.argv) > 2 else '1  акт'
+DATA_FILE = os.path.join(ROOT, 'schedule.json')
+PAGE = os.path.join(ROOT, 'index.html')
+BLOCK = re.compile(r'(<script id="schedule" type="application/json">)(.*?)(</script>)', re.S)
+
+
+def load_xlsx(xlsx, sheet):
+    """xlsx -> dict, плюс сохраняет читаемый schedule.json для правок руками."""
     data = parse(xlsx, sheet)
-    tpl = open(os.path.join(HERE, 'template.html'), encoding='utf-8').read()
-    js = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
-    assert tpl.count('__DATA__') == 1
-    out = os.path.join(ROOT, 'index.html')      # index.html — чтобы GitHub Pages открывал корень репозитория
-    with open(out, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(tpl.replace('__DATA__', js))
+    with open(DATA_FILE, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(data, f, ensure_ascii=False, indent=1)
+        f.write('\n')
+    return data
+
+
+def inject(data):
+    """Вшивает расписание в index.html, не трогая остальную разметку."""
+    html = open(PAGE, encoding='utf-8').read()
+    payload = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    html, n = BLOCK.subn(lambda m: m.group(1) + payload + m.group(3), html, count=1)
+    if not n:
+        raise SystemExit('в index.html нет блока <script id="schedule" type="application/json">')
+    with open(PAGE, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(html)
+
+
+def main():
+    args = sys.argv[1:]
+    xlsx = args[0] if args else next(iter(sorted(glob.glob(os.path.join(ROOT, '*.xlsx')))), None)
+    sheet = args[1] if len(args) > 1 else '1  акт'
+
+    if xlsx:
+        data = load_xlsx(xlsx, sheet)
+        src = '%s [%s]' % (os.path.basename(xlsx), sheet)
+    else:
+        data = json.load(open(DATA_FILE, encoding='utf-8'))
+        src = os.path.basename(DATA_FILE)
+
+    inject(data)
     total = sum(len(d['lessons']) for d in data['days'])
-    print(f'{os.path.basename(xlsx)} [{sheet}] -> {out}: {total} блоков в {len(data["days"])} днях')
+    print('%s -> index.html: %d блоков в %d днях' % (src, total, len(data['days'])))
 
 
 if __name__ == '__main__':
