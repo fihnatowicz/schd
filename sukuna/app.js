@@ -281,7 +281,24 @@ function tick() {
 
 new ResizeObserver(() => document.documentElement.style.setProperty('--hdr-h', headerH() + 'px')).observe($('#top'));
 $('#fab').addEventListener('click', () => scrollToItem(state && state.target));
-document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
+/* Подхват новой версии. iOS не перезапрашивает страницу, когда приложение с
+   домашнего экрана возвращается из фона, а GitHub Pages держит файлы в кеше
+   10 минут (Cache-Control: max-age=600, повлиять на это нельзя). Поэтому после
+   долгого отсутствия сами тянем оболочку мимо кеша и перезагружаемся.
+   cache:'reload' и запрашивает с сервера, и обновляет запись в кеше,
+   так что следующий location.reload() уже читает свежие файлы. */
+const SHELL = ['./', 'app.css', 'app.js'];
+const AWAY_MS = 60000;
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden) { hiddenAt = Date.now(); return; }
+  tick();
+  if (!hiddenAt || Date.now() - hiddenAt < AWAY_MS) return;
+  hiddenAt = 0;
+  try { await Promise.all(SHELL.map(u => fetch(u, { cache: 'reload' }))); }
+  catch (e) { return; }                     /* офлайн — остаёмся на текущей версии */
+  location.reload();
+});
 
 renderStatic();
 tick();
