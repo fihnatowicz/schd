@@ -21,22 +21,33 @@
 <body>
 <div class="glow" aria-hidden="true"></div>
 
+<div class="safetop" aria-hidden="true"></div>
+
 <header class="top" id="top">
-  <div class="top-art" aria-hidden="true"></div>
-  <div class="wrap">
-    <div class="bar">
-      <div class="brand">
-        <img class="logo" src="icon.png" alt="" width="42" height="42" decoding="async">
-        <div><b id="m-title"></b><small id="m-sub"></small></div>
+  <div class="hero">
+    <div class="top-art" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="bar">
+        <div class="brand">
+          <img class="logo" src="icon.png" alt="" width="42" height="42" decoding="async">
+          <div><b id="m-title"></b><small id="m-sub"></small></div>
+        </div>
+        <div class="clock" aria-live="off"><span id="ch">--</span><span class="colon">:</span><span id="cm">--</span><small id="cs">--</small></div>
       </div>
-      <div class="clock" aria-live="off"><span id="ch">--</span><span class="colon">:</span><span id="cm">--</span><small id="cs">--</small></div>
+      <div class="hero-space" aria-hidden="true"></div>
     </div>
-    <div class="hero-space" aria-hidden="true"></div>
+  </div>
+</header>
+
+<!-- вне <header>: sticky держится только внутри родителя, а лента должна
+     оставаться закреплённой на всю длину страницы -->
+<div class="daybar" id="daybar">
+  <div class="wrap">
     <nav class="days" id="daynav" aria-label="Дни недели"></nav>
   </div>
   <div class="scan"></div>
   <div class="bleed" aria-hidden="true"></div>
-</header>
+</div>
 
 <main id="list" class="wrap" style="padding-left:0;padding-right:0"></main>
 

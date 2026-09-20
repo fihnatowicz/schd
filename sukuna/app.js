@@ -19,7 +19,8 @@ const fmtDate = d => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
 const fmtRange = (a, b) => a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${MONTHS[b.getMonth()]}` : `${fmtDate(a)} – ${fmtDate(b)}`;
 const kindClass = c => c === 'ПР' ? 'k-pr' : c === 'ИНД' ? 'k-ind' : c === 'ГР' ? 'k-gr' : 'k-l';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const headerH = () => $('#top').offsetHeight;
+const safeTop = () => $('.safetop').offsetHeight;          /* вырез под строку состояния */
+const headerH = () => safeTop() + $('#daybar').offsetHeight;
 
 /* week Mon..Sat containing `now`; Sunday rolls to the coming week */
 function weekDates(now, weekOffset) {
@@ -279,7 +280,8 @@ function tick() {
   return st;
 }
 
-new ResizeObserver(() => document.documentElement.style.setProperty('--hdr-h', headerH() + 'px')).observe($('#top'));
+new ResizeObserver(() => document.documentElement.style.setProperty(
+  '--hdr-h', 'calc(env(safe-area-inset-top) + ' + $('#daybar').offsetHeight + 'px)')).observe($('#daybar'));
 $('#fab').addEventListener('click', () => scrollToItem(state && state.target));
 /* Подхват новой версии. iOS не перезапрашивает страницу, когда приложение с
    домашнего экрана возвращается из фона, а GitHub Pages держит файлы в кеше
