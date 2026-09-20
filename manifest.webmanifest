@@ -1,0 +1,10 @@
+{
+  "name": "Ангелина · расписание",
+  "short_name": "Ангелина",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#09060a",
+  "theme_color": "#09060a",
+  "icons": [{ "src": "icon.png", "sizes": "180x180", "type": "image/png" }]
+}
