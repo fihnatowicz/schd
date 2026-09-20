@@ -54,25 +54,9 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cu
 .clock .colon{animation:blink 1s steps(2) infinite;color:var(--text);margin:0 1px}
 .clock small{font-size:10.5px;color:var(--muted);margin-left:5px;font-weight:500}
 
-.ticker{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:8px 10px;margin:0 0 9px;
-  border:1px solid var(--line2);border-left:3px solid var(--red);border-radius:4px;min-height:42px;
-  background:linear-gradient(90deg,rgba(226,32,58,.16),rgba(26,18,24,.46) 45%);
-  backdrop-filter:blur(7px) saturate(120%);-webkit-backdrop-filter:blur(7px) saturate(120%);
-  transition:border-color .3s,transform .15s}
-.ticker:active{transform:scale(.99)}
-.tk-state{display:inline-flex;align-items:center;gap:6px;flex:none;font:600 9px/1 var(--display);
-  letter-spacing:.16em;text-transform:uppercase;padding:6px 8px;border-radius:3px}
-.tk-state.hot{color:#0b0508;background:var(--red);box-shadow:0 0 16px rgba(226,32,58,.55)}
-.tk-state.soon{color:#ffe8e6;background:var(--soon);box-shadow:0 0 16px rgba(216,26,52,.5)}
-.tk-state.alt{color:#0b0508;background:var(--bone)}
-.tk-state.mute{color:var(--muted);background:rgba(161,141,141,.14)}
-.tk-subj{flex:1;min-width:0;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tk-meta{flex:none;font:600 11px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--hot);white-space:nowrap}
-.tk-meta.soon{color:#ff8a93}
-.tk-meta.alt{color:var(--bone)}
-.tk-meta.mute{color:var(--dim)}
+/* высота бывшей строки-тикера: место сохранено, чтобы шапка держала пропорции hero */
+.hero-space{height:51px}
 .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
-.hot .dot{animation:pulse 1.6s ease-out infinite}
 
 .days{display:flex;gap:6px;padding:2px 0 10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
 .days::-webkit-scrollbar{display:none}

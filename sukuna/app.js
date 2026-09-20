@@ -202,19 +202,10 @@ function patch(it, st) {
   }
 }
 
-function renderTicker(st) {
-  const L = st.live, N = st.next;
-  let cls, state, subj, meta;
-  if (L) {
-    cls = L.onBreak ? 'alt' : 'hot'; state = L.onBreak ? 'перерыв' : 'сейчас'; subj = L.subject;
-    meta = L.onBreak && L.resumeAt != null ? `до ${minToT(L.resumeAt)}` : `ещё ${fmtDur(L.e - st.nowMin)}`;
-  } else if (N) {
-    cls = 'soon'; state = 'далее'; subj = N.subject;
-    meta = sameDay(N.date, st.now) ? `через ${fmtDur(N.s - st.nowMin)}` : `${N.day.short} ${fmtDate(N.date)}, ${N.lesson.start}`;
-  } else { cls = 'mute'; state = '—'; subj = 'Занятий нет'; meta = ''; }
-  $('#ticker').innerHTML = `<span class="tk-state ${cls}"><i class="dot"></i>${state}</span><span class="tk-subj">${esc(subj)}</span><span class="tk-meta ${cls}">${esc(meta)}</span>`;
-  $('#fab').classList.toggle('alt', !L);
-  $('#fab-txt').textContent = L ? 'Сейчас' : 'Далее';
+function renderFab(st) {
+  const live = !!st.live;
+  $('#fab').classList.toggle('alt', !live);
+  $('#fab-txt').textContent = live ? 'Сейчас' : 'Далее';
 }
 
 function renderStatic() {
@@ -281,7 +272,7 @@ function tick() {
   const key = st.dates[0][1].toDateString() + '|' + now.toDateString();
   if (key !== renderedKey) { renderedKey = key; activeKey = null; render(st); }
   ITEMS.forEach(it => patch(it, st));
-  renderTicker(st);
+  renderFab(st);
   const tid = st.target ? st.target.id : null;
   if (tid !== targetId) { targetId = tid; watchTarget(st.target); }
   state = st;
@@ -289,7 +280,6 @@ function tick() {
 }
 
 new ResizeObserver(() => document.documentElement.style.setProperty('--hdr-h', headerH() + 'px')).observe($('#top'));
-$('#ticker').addEventListener('click', () => scrollToItem(state && state.target));
 $('#fab').addEventListener('click', () => scrollToItem(state && state.target));
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
 
