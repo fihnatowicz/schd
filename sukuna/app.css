@@ -35,10 +35,11 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cu
 .top>.wrap{position:relative;z-index:1}
 .top-art{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .top-art::before,.top-art::after{content:"";position:absolute;inset:0}
-.top-art::before{background:url(hero.jpg) no-repeat 50% 50%/cover;opacity:.7;filter:saturate(.95) contrast(1.04)}
+.top-art::before{background:url(hero.jpg) no-repeat 50% 50%/cover;opacity:1;
+  filter:saturate(.95) contrast(1.08) brightness(1.12)}
 .top-art::after{background:
-    linear-gradient(90deg,rgba(8,7,10,.94),rgba(8,7,10,.6) 45%,rgba(8,7,10,.1)),
-    linear-gradient(180deg,rgba(8,7,10,.2),rgba(8,7,10,.24) 40%,rgba(8,7,10,.66) 70%,rgba(8,7,10,.93)),
+    linear-gradient(90deg,rgba(8,7,10,.92),rgba(8,7,10,.5) 45%,rgba(8,7,10,.05)),
+    linear-gradient(180deg,rgba(8,7,10,.16),rgba(8,7,10,.2) 40%,rgba(8,7,10,.72) 70%,rgba(8,7,10,.94)),
     radial-gradient(120% 80% at 50% 0,rgba(226,32,58,.16),transparent 72%)}
 
 .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0 8px}
