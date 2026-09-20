@@ -288,8 +288,10 @@ $('#fab').addEventListener('click', () => scrollToItem(state && state.target));
    10 минут (Cache-Control: max-age=600, повлиять на это нельзя). Поэтому после
    долгого отсутствия сами тянем оболочку мимо кеша и перезагружаемся.
    cache:'reload' и запрашивает с сервера, и обновляет запись в кеше,
-   так что следующий location.reload() уже читает свежие файлы. */
-const SHELL = ['./', 'app.css', 'app.js'];
+   так что следующий location.reload() уже читает свежий index.html. Стили и
+   скрипт подтянутся сами: они помечены ?v=<хеш>, и у новой разметки ссылки
+   другие — в кеше их просто нет. */
+const SHELL = ['./'];
 const AWAY_MS = 60000;
 let hiddenAt = 0;
 document.addEventListener('visibilitychange', async () => {

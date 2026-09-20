@@ -13,6 +13,7 @@
 сохраняются — по ним страница определяет «перерыв» внутри блока).
 """
 import glob
+import hashlib
 import json
 import os
 import re
@@ -175,6 +176,29 @@ def load_xlsx(xlsx, sheet):
     return data
 
 
+def stamp(html):
+    """Привязывает app.css и app.js к их содержимому: ?v=<хеш>.
+
+    Без этого index.html, app.css и app.js кешируются независимо (GitHub Pages
+    отдаёт max-age=600 на каждый файл), и браузер легко собирает свежую разметку
+    со старыми стилями — вёрстка разъезжается. С меткой конкретный index.html
+    физически не может подтянуть чужую версию: URL другой, в кеше его нет.
+    """
+    h = hashlib.md5()
+    for name in ('app.css', 'app.js'):
+        h.update(open(os.path.join(ROOT, name), 'rb').read())
+    ver = h.hexdigest()[:8]
+    for attr, name in (('href="', 'app.css'), ('src="', 'app.js')):
+        key = attr + name
+        i = html.find(key)
+        if i < 0:
+            raise SystemExit('в index.html нет ссылки на ' + name)
+        start = i + len(attr)
+        end = html.index('"', start)
+        html = html[:start] + name + '?v=' + ver + html[end:]
+    return html, ver
+
+
 def inject(data):
     """Вшивает расписание в index.html, не трогая остальную разметку."""
     html = open(PAGE, encoding='utf-8').read()
@@ -182,8 +206,10 @@ def inject(data):
     html, n = BLOCK.subn(lambda m: m.group(1) + payload + m.group(3), html, count=1)
     if not n:
         raise SystemExit('в index.html нет блока <script id="schedule" type="application/json">')
+    html, ver = stamp(html)
     with open(PAGE, 'w', encoding='utf-8', newline='\n') as f:
         f.write(html)
+    return ver
 
 
 def main():
@@ -198,9 +224,10 @@ def main():
         data = json.load(open(DATA_FILE, encoding='utf-8'))
         src = os.path.basename(DATA_FILE)
 
-    inject(data)
+    ver = inject(data)
     total = sum(len(d['lessons']) for d in data['days'])
-    print('%s -> index.html: %d блоков в %d днях' % (src, total, len(data['days'])))
+    print('%s -> index.html: %d блоков в %d днях, ассеты помечены ?v=%s'
+          % (src, total, len(data['days']), ver))
 
 
 if __name__ == '__main__':
