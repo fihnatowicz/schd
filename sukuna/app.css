@@ -63,7 +63,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cu
 .clock small{font-size:10.5px;color:var(--muted);margin-left:5px;font-weight:500}
 
 /* высота бывшей строки-тикера: место сохранено, чтобы шапка держала пропорции hero */
-.hero-space{height:51px}
+.hero-space{height:81px}
 .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
 
 .days{display:flex;gap:6px;padding:7px 0 10px;overflow-x:auto;scrollbar-width:none;scroll-snap-type:x proximity}
